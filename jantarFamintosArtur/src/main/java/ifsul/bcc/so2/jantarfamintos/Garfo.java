@@ -8,7 +8,7 @@ public class Garfo {
         this.ocupado = false;
     }
 
-    public boolean isOcupado() {
+    public synchronized boolean isOcupado() {
         return ocupado;
     }
 

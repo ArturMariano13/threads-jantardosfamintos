@@ -1,5 +1,6 @@
 package ifsul.bcc.so2.jantarfamintos;
 
+
 public class Faminto extends Thread {
 
     private int id;
@@ -17,31 +18,26 @@ public class Faminto extends Thread {
 
     private synchronized void pensar() throws InterruptedException {
         System.out.println("Faminto " + id + " está pensando.");
-        Thread.sleep((int) (Math.random() * 1000));
+        Thread.sleep(2000);
     }
 
     private synchronized void comer() throws InterruptedException {
         while (true) {
             if (this.tenhoDireito && this.tenhoEsquerdo) {
                 System.out.println("Faminto " + id + " está comendo.");
-                Thread.sleep((int) (Math.random() * 1000));
+                Thread.sleep(2000);
+                System.out.println("Faminto " + id + " terminou de comer.");
                 garfoEsquerdo.soltar();
                 garfoDireito.soltar();
                 this.tenhoDireito = false;
                 this.tenhoEsquerdo = false;
+                
                 break;
-            } else if (!garfoDireito.isOcupado() || !garfoEsquerdo.isOcupado()) {
-                if (!garfoDireito.isOcupado()) {
-                    garfoDireito.pegar();
-                    tenhoDireito = true;
-                    if (!garfoEsquerdo.isOcupado()) {
-                        garfoEsquerdo.pegar();
-                        tenhoEsquerdo = true;
-                    } else {
-                        garfoDireito.soltar();
-                        tenhoDireito = false;
-                    }
-                } else if (!garfoEsquerdo.isOcupado()) {
+            } 
+            
+            // filósofos com id par tentam pegar o garfo esquerdo primeiro
+            if (id % 2 == 0){
+                if (!garfoEsquerdo.isOcupado()) {
                     garfoEsquerdo.pegar();
                     tenhoEsquerdo = true;
                     if (!garfoDireito.isOcupado()) {
@@ -52,13 +48,26 @@ public class Faminto extends Thread {
                         tenhoEsquerdo = false;
                     }
                 }
+                // ímpares tentam o direito primeiro
+            } else {
+                if (!garfoDireito.isOcupado()) {
+                    garfoDireito.pegar();
+                    tenhoDireito = true;
+                    if (!garfoEsquerdo.isOcupado()) {
+                        garfoEsquerdo.pegar();
+                        tenhoEsquerdo = true;
+                    } else {
+                        garfoDireito.soltar();
+                        tenhoDireito = false;
+                    }
+                }
             }
         }
     }
 
     @Override
     public void run() {
-        try {
+        try {         
             while (true) {
                 comer();
                 pensar();
