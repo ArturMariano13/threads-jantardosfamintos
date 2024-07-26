@@ -15,7 +15,7 @@ public class Garfo {
         this.ocupado = false;
     }
 
-    public boolean isOcupado() {
+    public synchronized boolean isOcupado() {
         return ocupado;
     }
 
@@ -36,8 +36,7 @@ public class Garfo {
     }
     
     public synchronized void soltar() {
-        
-        //if(this.isOcupado()) {        }
+      
         this.setOcupado(false);
         notifyAll();
 

@@ -24,45 +24,66 @@ public class Faminto extends Thread {
 
     private synchronized void pensar() throws InterruptedException {
         System.out.println("Faminto " + id + " está pensando.");
-        Thread.sleep((int) (Math.random() * 1000));
+        Thread.sleep((int) (5000));
     }
 
     private synchronized void comer() throws InterruptedException {
-        System.out.println("Faminto " + id + " está comendo.");
-        Thread.sleep((int) (Math.random() * 1000));
-        System.out.println("Faminto " + id + " PAROU DE COMER.");
+        
+        while (true) {
+                
+                if(this.tenhoEsquerdo && this.tenhoDireito) {
+                    System.out.println("Faminto " + id + " está comendo.");
+                    Thread.sleep((int) (5000));
+                    System.out.println("Faminto " + id + " PAROU DE COMER.");
+                    this.garfoEsquerdo.soltar();
+                    this.garfoDireito.soltar();
+                    this.tenhoEsquerdo = false;
+                    this.tenhoDireito = false;
+                    
+                    break;
+                }
+                
+                if(id%2==0){
+                    
+                    if(!this.garfoEsquerdo.isOcupado()) {
+                        this.garfoEsquerdo.pegar();
+                        this.tenhoEsquerdo = true;
+                        
+                        if(!this.garfoDireito.isOcupado()) {
+                            this.garfoDireito.pegar();
+                            this.tenhoDireito = true;
+                        } else {
+                            this.garfoEsquerdo.soltar();
+                            this.tenhoEsquerdo = false;
+                        }
+                    }
+                } else {
+                    if(!this.garfoDireito.isOcupado()) {
+                        this.garfoDireito.pegar();
+                        this.tenhoDireito = true;
+
+                        if(!this.garfoEsquerdo.isOcupado()) {
+                            this.garfoEsquerdo.pegar();
+                            this.tenhoEsquerdo = true;
+                        }
+                        else {
+                            this.garfoDireito.soltar();
+                            this.tenhoDireito = false;
+                        }
+
+                    }
+                }
+
+        }
     }
 
     @Override
     public void run() {
         try {
+            
             while (true) {
-                
-                if(this.tenhoEsquerdo && this.tenhoDireito) {
-                    comer();
-                    this.garfoEsquerdo.soltar();
-                    this.garfoDireito.soltar();
-                    this.tenhoEsquerdo = false;
-                    this.tenhoDireito = false;
-                    continue;
-                } else {
-                    pensar();
-                }
-                
-                if(!this.garfoEsquerdo.isOcupado() && !this.garfoDireito.isOcupado()){
-                    this.garfoEsquerdo.pegar();
-                    this.tenhoEsquerdo = true;
-                    if(!this.garfoDireito.isOcupado()) {
-                        this.garfoDireito.pegar();
-                        this.tenhoDireito = true;
-                    } else {
-                        //this.tenhoDireito = false;
-                        this.garfoEsquerdo.soltar();
-                        this.tenhoEsquerdo = false;
-                        
-                    }
-                }
-
+                comer();
+                pensar();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
